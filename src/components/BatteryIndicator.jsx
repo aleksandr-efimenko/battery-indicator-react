@@ -15,7 +15,7 @@ export function BatteryIndicator() {
   useEffect(() => {
     // Check if the browser supports the Battery Status API and setup the event listeners
     const checkBatteryAPIAndSetup = async () => {
-      if ('getBattery' in navigator) {
+      if (navigator.getBattery) {
         try {
           // Get the battery status
           const battery = await navigator.getBattery();
@@ -43,23 +43,28 @@ export function BatteryIndicator() {
       {batteryInfo.supported ? (
         <div className="flex flex-col items-center justify-center space-y-2">
           <BatteryInfo batteryInfo={batteryInfo} />
-          <BatteryStatus charging={batteryInfo.charging} />
         </div>
       ) : (
-        <UnsupportedBrowserMessage />
+        <div className="p-4 rounded-md bg-gray-200 text-gray-700">
+          Battery status is not supported in this browser.
+        </div>
       )}
     </div>
   </div>
   );
 }
 
+
+// Component to display the battery info
 const BatteryInfo = ({ batteryInfo }) => (
-    <div className={`battery-indicator w-32 h-14 border-2 ${batteryInfo.charging ? 'border-green-500' : 'border-gray-500'} rounded-lg flex items-center justify-start overflow-hidden relative`}>
+    <div className={`w-32 h-14 border-2 ${batteryInfo.charging ? 'border-green-500' : 'border-gray-500'} rounded-lg flex items-center justify-start overflow-hidden relative`}>
+      {/* Battery level bar */}
       <div
-        className={`battery-level ${batteryInfo.level > 20 ? 'bg-green-300' : 'bg-red-500'} h-full`}
+        className={`${batteryInfo.level > 20 ? 'bg-green-300' : 'bg-red-500'} h-full`}
         style={{ width: `${batteryInfo.level}%` }}
       ></div>
-      <div className="absolute w-full h-full flex items-center justify-center text-lg font-semibold text-gray-500">
+      {/* Battery level text */}
+      <div className="absolute w-full h-full flex items-center justify-center text-lg font-semibold">
         {batteryInfo.level.toFixed(0)}%
       </div>
       {batteryInfo.charging && <ChargingIcon />}
@@ -67,22 +72,8 @@ const BatteryInfo = ({ batteryInfo }) => (
 );
 
 const ChargingIcon = () => (
-    <svg className="absolute right-0 mr-[-6px] w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <svg className="absolute right-0 mr-[-6px] w-6 h-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 7L6 12h4v8l5-5h-4v-8z" />
   </svg>
 );
 
-const UnsupportedBrowserMessage = () => (
-    <div className="p-4 rounded-md bg-gray-200 text-gray-700">
-      Battery status is not supported in this browser.
-    </div>
-);
-
-const BatteryStatus = ({ charging }) => (
-  <div className="text-sm font-medium">
-    {charging ? 'Charging' : 'Not Charging'}
-  </div>
-);
-
-
-  
